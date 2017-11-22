@@ -1,0 +1,17 @@
+version: '1.0'
+steps:
+  compile_binary:
+    image: r.cfcr.io/s3than/golang:latest
+    working_directory: ${{main_clone}}
+    description: Building App
+    commands:
+      # Need to have the source in the correct GOPATH folder - let's do that
+      - mkdir -p /go/src/github.com/${{CF_REPO_OWNER}}
+      - ln -s /codefresh/volume/${{CF_REPO_NAME}} /go/src/github.com/${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
+      - cd /go/src/github.com/${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
+      # Install pre-requisites and execute tests
+      - dep ensure
+      - GOOS=linux GOARCH=amd64 go build -v -o pkg/assume_${{CF_BRANCH_VERSION_NORMALIZED}}_linux_amd64
+      - cd pkg
+      - zip assume_${{CF_BRANCH_VERSION_NORMALIZED}}_linux_amd64.zip assume_${{CF_BRANCH_VERSION_NORMALIZED}}_linux_amd64
+      - ghr --delete -t ${{GITHUB_TOKEN}} -b "${{CF_COMMIT_MESSAGE}}" -u ${{CF_REPO_OWNER}} -r ${{CF_REPO_NAME}} ${{CF_BRANCH}} assume_${{CF_BRANCH_VERSION_NORMALIZED}}_linux_amd64.zip
