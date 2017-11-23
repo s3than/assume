@@ -14,7 +14,7 @@ Create a config file that can be used in the format from aws-extend-switch-roles
     region = ap-southeast-2
 
 
-[![Codefresh build status]( https://g.codefresh.io/api/badges/build?repoOwner=s3than&repoName=assume&branch=master&pipelineName=assume&accountName=s3than&key=eyJhbGciOiJIUzI1NiJ9.NTk2ODRiMGZkODc0NjAwMDAxZjhhNmFj.lSAMiveZ-q1di_6aNrTtS4jnpm7I3P9WS__6D8R7xuw&type=cf-1)]( https://g.codefresh.io/repositories/s3than/assume/builds?filter=trigger:build;branch:master;service:5a12afe8b7f5280001d1d04f~assume)
+[![Codefresh build status]( https://g.codefresh.io/api/badges/build?repoOwner=s3than&repoName=assume&branch=master&pipelineName=assume&accountName=s3than&type=cf-1)]( https://g.codefresh.io/repositories/s3than/assume/builds?filter=trigger:build;branch:master;service:5a14ca51907b050001a46ac0~assume)
 
 <!-- ### Prerequisites
 
@@ -78,11 +78,5 @@ See also the list of [contributors](https://github.com/s3than/assume/contributor
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for detail
 
