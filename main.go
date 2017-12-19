@@ -84,7 +84,8 @@ func main() {
 
 	usr, err := user.Current()
 	if err != nil {
-		panic(err)
+		fmt.Printf("%+v", err)
+		os.Exit(1)
 	}
 
 	if *config == "" {
@@ -101,6 +102,11 @@ func main() {
 
 	os.OpenFile(configPath, os.O_CREATE, 0666)
 	configFile, err := ini.Load(configPath)
+
+	if err != nil {
+		fmt.Printf("%+v", err)
+		os.Exit(1)
+	}
 
 	os.OpenFile(configCredsPath, os.O_CREATE, 0666)
 	configFile.Append(configCredsPath)
