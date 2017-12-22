@@ -4,7 +4,8 @@ steps:
     image: r.cfcr.io/s3than/golang:latest
     working_directory: ${{main_clone}}
     description: Building App
-    commands: |
+    commands:
+    - |
       mkdir -p /go/src/github.com/${{CF_REPO_OWNER}}
       ln -s /codefresh/volume/${{CF_REPO_NAME}} /go/src/github.com/${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
       cd /go/src/github.com/${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
