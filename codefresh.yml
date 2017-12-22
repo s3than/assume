@@ -19,4 +19,4 @@ steps:
     when:
       condition:
         all:
-          tag: '"${{CF_BRANCH_VERSION_NORMALIZED}}" == "^(\d+\.)?(\d+\.)?(\*|\d+)$"'
+          tag: '"${{CF_BRANCH}}" == "^(\d+\.)?(\d+\.)?(\*|\d+)$"'
