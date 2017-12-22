@@ -19,9 +19,6 @@ build:
     image_tag: latest
     pull: true
     options: "-w $SHIPPABLE_BUILD_DIR"
-
-build:
-
   # http://docs.shippable.com/ci/shippableyml/#ci
   ci:
     # npm mirrors can sometimes be flacky, better to use shippable_retry
