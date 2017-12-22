@@ -5,6 +5,7 @@ FROM golang:1.8-alpine AS builder
 # set build arguments: GitHub user and repository
 ARG GH_USER
 ARG GH_REPO
+ARG GH_VERSION
 
 # Create and set working directory
 RUN mkdir -p /go/src/github.com/$GH_USER/$GH_REPO
@@ -15,7 +16,7 @@ COPY . .
 
 RUN apk add --no-cache wget && \
   cd /tmp && \
-  wget https://github.com/golang/dep/releases/download/v0.3.2/dep-linux-amd64 && \
+  wget https://github.com/golang/dep/releases/download/$GH_VERSION/dep-linux-amd64 && \
   mv /tmp/dep-linux-amd64 /usr/bin/dep && \
   chmod +x /usr/bin/dep && \
   cd /go/src/github.com/$GH_USER/$GH_REPO && \
