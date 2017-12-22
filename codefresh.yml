@@ -19,4 +19,5 @@ steps:
     when:
       condition:
         all:
-          tag: '"${{CF_BRANCH}}" == "^(?:([v]\d+)\.)?(?:(\d+)\.)?(\*|\d+)$"'
+          # tag: '"${{CF_BRANCH}}" == "^(?:([v]\d+)\.)?(?:(\d+)\.)?(\*|\d+)$"'
+          match("${{CF_BRANCH}}", "^(?:([v]\d+)\.)?(?:(\d+)\.)?(\*|\d+)$", true)
