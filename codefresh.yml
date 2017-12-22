@@ -20,4 +20,4 @@ steps:
       condition:
         all:
           # tag: '"${{CF_BRANCH}}" == "^(?:([v]\d+)\.)?(?:(\d+)\.)?(\*|\d+)$"'
-          tag: 'match("${{CF_BRANCH}}", "^(?:([v]\d+)\.)?(?:(\d+)\.)?(\*|\d+)$", true) == true'
+          tag: 'match("${{CF_BRANCH}}", "^(?:([v]\\d+)\\.)?(?:(\\d+)\\.)?(\\*|\\d+)$", true) == true'
