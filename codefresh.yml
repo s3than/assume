@@ -23,4 +23,4 @@ steps:
           # /[\[\]?*+|{}\\()@.\n\r]/
           # ^(?:([v][\\]d+)[\\].)?(?:([\\]d+)[\\].)?([\\]*|[\\]d+)$
                     # notFeatureBranch: 'match("${{CF_BRANCH}}", "^FB-", true) == false'
-          tag: 'match("${{CF_BRANCH}}", "^v[\\]d+", true) == true'
+          tag: 'match("${{CF_BRANCH}}", "^v", true) == true'
