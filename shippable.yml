@@ -16,6 +16,10 @@ build:
   ci:
     - go get -u github.com/golang/dep/cmd/dep
     - dep ensure
+    - GOOS=linux GOARCH=amd64 go build -v -o pkg/assume_linux_amd64
+    - ls -la
+    - cd pkg
+    - ls -la
 
 #
 # using pre-defined build variables
