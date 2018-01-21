@@ -7,12 +7,12 @@ branches:
   only:
     - master
 
-# 
+#
 # using pre-defined build variables
 # full list http://docs.shippable.com/ci/advancedOptions/environmentVariables/
-env:
-  - secure: s7UNW6H+gZ3xNTVIgaOzC5RqLgR0qM5aRTPIO8wCeAwNXiPERNV5/m/+MG911soKQgXHdFc0wwTc/fbF2cL9jzWQ0FIxXJrDs86zvfVrRGhxta7f7KxFLvPl/T6yRluUQvH8vFBd/90vuGrb1ua6alBo8vW/d3KXfPhK8kjY4o7l4Zhd0MEbtHXuIrXKQHsI3tcgyc66fjW0JsJxf/EXNCYuEcl6CvVeIlVXN83wlc9Sry/EWp/UqgnWIvoBYzhrLzmAAbW+wNUUScXe7W2ymHsBFNvWWfY4Kkn70Gsgbp3RX3oh8wqhIXgKmnj6KW70H0pV9xb8wvz1LrQoSK4Gjw==
-  
+#env:
+#  - secure: s7UNW6H+gZ3xNTVIgaOzC5RqLgR0qM5aRTPIO8wCeAwNXiPERNV5/m/+MG911soKQgXHdFc0wwTc/fbF2cL9jzWQ0FIxXJrDs86zvfVrRGhxta7f7KxFLvPl/T6yRluUQvH8vFBd/90vuGrb1ua6alBo8vW/d3KXfPhK8kjY4o7l4Zhd0MEbtHXuIrXKQHsI3tcgyc66fjW0JsJxf/EXNCYuEcl6CvVeIlVXN83wlc9Sry/EWp/UqgnWIvoBYzhrLzmAAbW+wNUUScXe7W2ymHsBFNvWWfY4Kkn70Gsgbp3RX3oh8wqhIXgKmnj6KW70H0pV9xb8wvz1LrQoSK4Gjw==
+
 build:
   pre_ci_boot:
     image_name: s3than/golang
