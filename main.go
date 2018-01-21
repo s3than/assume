@@ -193,7 +193,7 @@ func assumeRole(creds AssumeCredentials) (*sts.Credentials, error) {
 
 	var assumeRoleOutput *sts.AssumeRoleOutput        // nil
 	var sessionTokenOutput *sts.GetSessionTokenOutput // nil
-	var credentials *sts.Credentials
+	var stsCredentials *sts.Credentials
 	var err error
 
 	switch {
@@ -222,7 +222,7 @@ func assumeRole(creds AssumeCredentials) (*sts.Credentials, error) {
 		return sessionTokenOutput.Credentials, err
 	}
 
-	return credentials, errors.New("No session set")
+	return stsCredentials, errors.New("no session set")
 }
 
 func getCredentials(config *ini.File, account string, creds AssumeCredentials) (AssumeCredentials, error) {
@@ -233,7 +233,7 @@ func getCredentials(config *ini.File, account string, creds AssumeCredentials) (
 	}
 
 	if section == nil {
-		return creds, errors.New("No AWS Config located")
+		return creds, errors.New("no AWS config located")
 	}
 
 	profile, err := section.GetKey("source_profile")
