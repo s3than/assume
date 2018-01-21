@@ -9,17 +9,18 @@ go:
 # use this to control what branches get built.
 # http://docs.shippable.com/ci/advancedOptions/branches/
 branches:
-  except:
+  only:
     - master
 
 build:
   ci:
     - go get -u github.com/golang/dep/cmd/dep
+    - go get -u github.com/tcnksm/ghr
     - dep ensure
-    - GOOS=linux GOARCH=amd64 go build -v -o pkg/assume_linux_amd64
+    - if [ "$IS_GIT_TAG" == true ]; then GOOS=linux GOARCH=amd64 go build -v -o pkg/assume_$GIT_TAG_NAME_linux_amd64; fi
+    - if [ "$IS_GIT_TAG" == true ]; then cd pkg && zip assume_$GIT_TAG_NAME_linux_amd64.zip assume_$GIT_TAG_NAME_linux_amd64; fi
     - ls -la
-    - cd pkg
-    - ls -la
+
 
 #
 # using pre-defined build variables
