@@ -1,4 +1,1 @@
-assume
-vendor/
-.vscode/
-pkg/
+vendor
