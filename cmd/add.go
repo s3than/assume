@@ -22,6 +22,7 @@ import (
 	"github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/manifoldco/promptui"
+	"github.com/s3than/assume/account"
 	"github.com/spf13/cobra"
 )
 
@@ -42,7 +43,6 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("+%v", cmd)
 		addAccount()
 	},
 }
@@ -106,11 +106,86 @@ func addAccount() {
 	}
 }
 
+// type BaseAccount struct {
+// 	ProfileName        string `mapstructure:"profile_name"`
+// 	AwsAccessKeyID     string `mapstructure:"aws_access_key_id"`
+// 	AwsSecretAccessKey string `mapstructure:"aws_secret_access_key"`
+// 	Region             string
+// 	Secret             string
+// }
+
+// type CrossAccount struct {
+// 	ProfileName   string `mapstructure:"profile_name"`
+// 	RoleArn       string `mapstructure:"role_arn"`
+// 	SourceProfile string `mapstructure:"source_profile"`
+// }
+
+// type Accounts struct {
+// 	BaseAccounts  []BaseAccount  `mapstructure:"base_accounts"`
+// 	CrossAccounts []CrossAccount `mapstructure:"cross_accounts"`
+// 	Hosts         []Host
+// }
+
+// type Host struct {
+// 	Name string `mapstructure:"name"`
+// 	Port int
+// 	Key  string
+// }
+
 func promptBaseAccount() {
 
+	account.FindAllbyType("base")
+
+	// fmt.Printf("%+v", accounts)
+	// config.getBaseAccounts()
+	// var accounts Accounts
+
+	// err := viper.Unmarshal(&accounts)
+
+	// if err != nil {
+	// 	panic("Unable to unmarshal hosts")
+	// }
+
+	// fmt.Printf("%+v", accounts)
+	// var hosts []Host
+	// err := viper.UnmarshalKey("hosts", &hosts)
+	// if err != nil {
+	// 	panic("Unable to unmarshal hosts")
+	// }
+	// for _, h := range hosts {
+	// 	fmt.Printf("Name: %s, Port: %d, Key: %s\n", h.Name, h.Port, h.Key)
+	// }
+	// var baseAccounts []baseAccount
+	// var B baseAccounts
+
+	// baseAccountName := "tcolbert"
+
+	// err := viper.UnmarshalKey("base_accounts", &baseAccounts)
+
+	// if err != nil {
+	// 	panic("Unable to unmarshal config")
+	// }
+
+	// fmt.Printf("%+v", baseAccounts)
+	// for _, h := range B.baseAccounts {
+	// 	fmt.Printf("profileName: %s, awsAccessKeyID: %s, awsSecretAccessKey: %s\n", h.profileName, h.awsAccessKeyID, h.awsSecretAccessKey)
+	// }
+
+	// subv := viper.Get("base_accounts." + baseAccountName)
+	// Unmarshal(&B)
+
+	// viper
+	// viper.Set("base_accounts.test", subv)
+	// viper.WriteConfig()
+	// subv["test"] = "test"
+	// fmt.Printf("%+v", B)
+
+	// fmt.Printf("%+v", subv)
+	// fmt.Printf("%+v", err)
 }
 
 func promptCrossAccount() {
+
 	validateRoleName := func(input string) error {
 
 		err := validation.Validate(input,
@@ -170,6 +245,10 @@ func promptCrossAccount() {
 func init() {
 	rootCmd.AddCommand(addCmd)
 
+	// fmt.Println("config")
+
+	// subv := viper.GetStringMap("base_accounts.tcolbert")
+	// fmt.Printf("%+v", subv)
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command

@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/s3than/aws_assume/cmd"
+import "github.com/s3than/assume/cmd"
 
 func main() {
 	cmd.Execute()

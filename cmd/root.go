@@ -48,9 +48,8 @@ func Execute() {
 }
 
 func init() {
-	fmt.Println(0.0)
 	cobra.OnInitialize(initConfig)
-	fmt.Println(0.2)
+
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
@@ -64,14 +63,10 @@ func init() {
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 
-	fmt.Println(0.1)
-
 	if cfgFile != "" {
-		fmt.Println(1)
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		fmt.Println(2)
 		// Find home directory.
 		home, err := homedir.Dir()
 		if err != nil {
@@ -79,18 +74,14 @@ func initConfig() {
 			os.Exit(1)
 		}
 
-		fmt.Println(3)
 		// Search config in home directory with name ".assume" (without extension).
-		viper.AddConfigPath(home + ".config/assume/")
-		viper.SetConfigName("config.yaml")
+		viper.SetConfigName("config")
+		viper.AddConfigPath(home + "/.config/assume")
 	}
 
-	fmt.Println(4)
 	viper.AutomaticEnv() // read in environment variables that match
-	fmt.Println(5)
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println(6)
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
 }
