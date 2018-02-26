@@ -2,10 +2,10 @@ package account
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 
 	"github.com/spf13/viper"
+	//"fmt"
 )
 
 func mapAccountsByField(field string) map[string]Account {
@@ -18,16 +18,14 @@ func mapAccountsByField(field string) map[string]Account {
 		r := reflect.ValueOf(v)
 
 		if r.FieldByName(field).IsValid() == true {
-			// fmt.Printf("%+v", r.IsValid())
 			f := reflect.Indirect(r).FieldByName(field)
 			value := f.Interface().(string)
-			fmt.Printf("%+v", value)
-			// fieldName := reflect.TypeOf(value)
 			confMap[value] = v
 		}
 	}
 	return confMap
 }
+
 
 // func FindOneBy(field string) (Account, error) {
 
@@ -58,29 +56,36 @@ func mapAccountsByField(field string) map[string]Account {
 
 // 	return account
 // }
+func WriteAccountToConfig(account Account) bool {
+
+	var config Accounts
+
+	viper.Unmarshal(&config)
+	newAccounts := append(config.Accounts, account)
+
+	//config.Accounts = newAccounts
+
+	viper.Set("accounts", newAccounts)
+	err := viper.WriteConfig()
+
+	if err != nil {
+		return false
+	}
+	return true
+}
 
 // FindAllbyType return accounts by type
 func FindAllbyType(accountType string) ([]Account, error) {
 
 	confMap := mapAccountsByField("ProfileName")
-	fmt.Println("")
-	fmt.Printf("%+v", confMap)
-
-	var config Accounts
 
 	if allowedTypes(accountType) == false {
 		return nil, errors.New("invalid account type")
 	}
 
-	err := viper.Unmarshal(&config)
-
-	if err != nil {
-		panic("Unable to unmarshal hosts")
-	}
-
 	var accounts []Account
 
-	for _, a := range config.Accounts {
+	for _, a := range confMap {
 		if isBaseAccount(a) == true && accountType == "base" {
 			accounts = append(accounts, a)
 		} else if isBaseAccount(a) == false && accountType == "cross" {

@@ -22,7 +22,7 @@ import (
 	"github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/manifoldco/promptui"
-	"github.com/s3than/assume/account"
+	assumeAccount "github.com/s3than/assume/account"
 	"github.com/spf13/cobra"
 )
 
@@ -106,82 +106,16 @@ func addAccount() {
 	}
 }
 
-// type BaseAccount struct {
-// 	ProfileName        string `mapstructure:"profile_name"`
-// 	AwsAccessKeyID     string `mapstructure:"aws_access_key_id"`
-// 	AwsSecretAccessKey string `mapstructure:"aws_secret_access_key"`
-// 	Region             string
-// 	Secret             string
-// }
-
-// type CrossAccount struct {
-// 	ProfileName   string `mapstructure:"profile_name"`
-// 	RoleArn       string `mapstructure:"role_arn"`
-// 	SourceProfile string `mapstructure:"source_profile"`
-// }
-
-// type Accounts struct {
-// 	BaseAccounts  []BaseAccount  `mapstructure:"base_accounts"`
-// 	CrossAccounts []CrossAccount `mapstructure:"cross_accounts"`
-// 	Hosts         []Host
-// }
-
-// type Host struct {
-// 	Name string `mapstructure:"name"`
-// 	Port int
-// 	Key  string
-// }
-
 func promptBaseAccount() {
 
-	account.FindAllbyType("base")
+	accounts, err := assumeAccount.FindAllbyType("base")
 
-	// fmt.Printf("%+v", accounts)
-	// config.getBaseAccounts()
-	// var accounts Accounts
+	if err != nil {
+		panic("Unable to unmarshal hosts")
+	}
 
-	// err := viper.Unmarshal(&accounts)
+	fmt.Printf("%+v", accounts)
 
-	// if err != nil {
-	// 	panic("Unable to unmarshal hosts")
-	// }
-
-	// fmt.Printf("%+v", accounts)
-	// var hosts []Host
-	// err := viper.UnmarshalKey("hosts", &hosts)
-	// if err != nil {
-	// 	panic("Unable to unmarshal hosts")
-	// }
-	// for _, h := range hosts {
-	// 	fmt.Printf("Name: %s, Port: %d, Key: %s\n", h.Name, h.Port, h.Key)
-	// }
-	// var baseAccounts []baseAccount
-	// var B baseAccounts
-
-	// baseAccountName := "tcolbert"
-
-	// err := viper.UnmarshalKey("base_accounts", &baseAccounts)
-
-	// if err != nil {
-	// 	panic("Unable to unmarshal config")
-	// }
-
-	// fmt.Printf("%+v", baseAccounts)
-	// for _, h := range B.baseAccounts {
-	// 	fmt.Printf("profileName: %s, awsAccessKeyID: %s, awsSecretAccessKey: %s\n", h.profileName, h.awsAccessKeyID, h.awsSecretAccessKey)
-	// }
-
-	// subv := viper.Get("base_accounts." + baseAccountName)
-	// Unmarshal(&B)
-
-	// viper
-	// viper.Set("base_accounts.test", subv)
-	// viper.WriteConfig()
-	// subv["test"] = "test"
-	// fmt.Printf("%+v", B)
-
-	// fmt.Printf("%+v", subv)
-	// fmt.Printf("%+v", err)
 }
 
 func promptCrossAccount() {
@@ -214,8 +148,20 @@ func promptCrossAccount() {
 		return nil
 	}
 
+	promptProfile := promptui.Prompt{
+		Label:    "Profile Name",
+		Validate: validateRoleName,
+	}
+
+	profileName, err := promptProfile.Run()
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
+
 	promptRole := promptui.Prompt{
-		Label:    "AWS Role Name",
+		Label:    "AWS Cross Account Role Name",
 		Validate: validateRoleName,
 	}
 
@@ -233,13 +179,63 @@ func promptCrossAccount() {
 
 	awsAccount, err := promptAccount.Run()
 
+	accounts, err := assumeAccount.FindAllbyType("base")
+
+	if err != nil {
+		panic("Unable to unmarshal hosts")
+	}
+
+	var accountTypes []accountType
+
+	for _, a := range accounts {
+		accountTypes = append(accountTypes,
+			accountType{
+				Name: a.ProfileName,
+			},
+		)
+	}
+
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "\u21D2 {{ .Name | cyan }}",
+		Inactive: "  {{ .Name | cyan }}",
+		Selected: "\u21D2 {{ .Name | red | cyan }}",
+		Details: `
+	--------- Base Account ----------
+	{{ "Name:" | faint }}	{{ .Name }}`,
+	}
+
+	searcher := func(input string, index int) bool {
+		account := accountTypes[index]
+		name := strings.Replace(strings.ToLower(account.Name), " ", "", -1)
+		input = strings.Replace(strings.ToLower(input), " ", "", -1)
+
+		return strings.Contains(name, input)
+	}
+
+	prompt := promptui.Select{
+		Label:     "Base Account Profile to link",
+		Items:     accountTypes,
+		Templates: templates,
+		Size:      4,
+		Searcher:  searcher,
+	}
+
+	i, _, err := prompt.Run()
+
 	if err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
 		return
 	}
 
-	fmt.Printf("Your Aws Role is %q\n", roleName)
-	fmt.Printf("Your Aws Account is %q\n", awsAccount)
+	newAccount := assumeAccount.Account{
+		ProfileName:profileName,
+		RoleArn: "arn:aws:iam::" + awsAccount + ":role/" + roleName,
+		SourceProfile: accountTypes[i].Name,
+	}
+
+	assumeAccount.WriteAccountToConfig(newAccount)
+
 }
 
 func init() {
