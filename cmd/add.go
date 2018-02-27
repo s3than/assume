@@ -65,11 +65,13 @@ func addAccount() {
 		},
 	}
 
+
+	//{{"\"output\""}}
 	templates := &promptui.SelectTemplates{
 		Label:    "{{ . }}?",
 		Active:   "\u21D2 {{ .Name | cyan }} ({{ .Description | red }})",
 		Inactive: "  {{ .Name | cyan }} ({{ .Description | red }})",
-		Selected: "\u21D2 {{ .Name | red | cyan }}",
+		Selected: "{{ \"✔\" | green | bold }} {{ \"Account Type:\" | white }} {{ .Name | red | cyan }}",
 		Details: `
 --------- Account Details ----------
 {{ "Name:" | faint }}	{{ .Name }}
@@ -199,7 +201,7 @@ func promptCrossAccount() {
 		Label:    "{{ . }}?",
 		Active:   "\u21D2 {{ .Name | cyan }}",
 		Inactive: "  {{ .Name | cyan }}",
-		Selected: "\u21D2 {{ .Name | red | cyan }}",
+		Selected: "{{ \"✔\" | green | bold }} {{ \"Link Profile:\" | white }} {{ .Name | red | cyan }}",
 		Details: `
 	--------- Base Account ----------
 	{{ "Name:" | faint }}	{{ .Name }}`,

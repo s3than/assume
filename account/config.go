@@ -56,14 +56,13 @@ func mapAccountsByField(field string) map[string]Account {
 
 // 	return account
 // }
+// WriteAccountToConfig write account to config file
 func WriteAccountToConfig(account Account) bool {
 
 	var config Accounts
 
 	viper.Unmarshal(&config)
 	newAccounts := append(config.Accounts, account)
-
-	//config.Accounts = newAccounts
 
 	viper.Set("accounts", newAccounts)
 	err := viper.WriteConfig()
