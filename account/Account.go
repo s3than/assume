@@ -10,3 +10,10 @@ type Account struct {
 	RoleArn            string `mapstructure:"role_arn" yaml:"role_arn,omitempty"`
 	SourceProfile      string `mapstructure:"source_profile" yaml:"source_profile,omitempty"`
 }
+
+func (a Account) IsBase() bool {
+	if a.SourceProfile == "" && a.AwsAccessKeyID != "" {
+		return true
+	}
+	return false
+}

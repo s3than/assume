@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	"github.com/spf13/viper"
-	//"fmt"
 )
 
 func mapAccountsByField(field string) map[string]Account {
@@ -85,9 +84,9 @@ func FindAllbyType(accountType string) ([]Account, error) {
 	var accounts []Account
 
 	for _, a := range confMap {
-		if isBaseAccount(a) == true && accountType == "base" {
+		if a.IsBase()&& accountType == "base" {
 			accounts = append(accounts, a)
-		} else if isBaseAccount(a) == false && accountType == "cross" {
+		} else if !a.IsBase() && accountType == "cross" {
 			accounts = append(accounts, a)
 		}
 	}
@@ -103,9 +102,3 @@ func allowedTypes(accountType string) bool {
 	return false
 }
 
-func isBaseAccount(account Account) bool {
-	if account.SourceProfile == "" {
-		return true
-	}
-	return false
-}

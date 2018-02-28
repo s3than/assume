@@ -22,14 +22,21 @@
 
 
 [[constraint]]
-  name = "github.com/manifoldco/promptui"
-  # version = "0.2.1"
-  branch = "master"
-
-[[constraint]]
-  name = "github.com/spf13/cobra"
-  version = "0.0.1"
-
-[[constraint]]
   name = "github.com/go-ozzo/ozzo-validation"
   version = "3.3.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/manifoldco/promptui"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/mitchellh/go-homedir"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/spf13/cobra"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/spf13/viper"
