@@ -25,36 +25,6 @@ func mapAccountsByField(field string) map[string]Account {
 	return confMap
 }
 
-
-// func FindOneBy(field string) (Account, error) {
-
-// }
-
-//GetBaseAccounts Return all base accounts
-// func GetBaseAccounts() []BaseAccount {
-
-// 	var baseAccount []BaseAccount
-
-// 	err := viper.UnmarshalKey("base_accounts", &baseAccount)
-
-// 	if err != nil {
-// 		panic("Unable to unmarshal hosts")
-// 	}
-
-// 	return baseAccount
-// }
-
-// //GetCrossAccounts Return all base accounts
-// func GetCrossAccounts() []CrossAccount {
-
-// 	err := viper.UnmarshalKey("cross_accounts", &account)
-
-// 	if err != nil {
-// 		panic("Unable to unmarshal hosts")
-// 	}
-
-// 	return account
-// }
 // WriteAccountToConfig write account to config file
 func WriteAccountToConfig(account Account) bool {
 
@@ -72,6 +42,17 @@ func WriteAccountToConfig(account Account) bool {
 	return true
 }
 
+func ProfileExists(profileName string) bool {
+
+	confMap := mapAccountsByField("ProfileName")
+
+	if _, ok := confMap[profileName]; ok {
+		return true
+	}
+
+	return false
+}
+
 // FindAllbyType return accounts by type
 func FindAllbyType(accountType string) ([]Account, error) {
 
@@ -84,7 +65,7 @@ func FindAllbyType(accountType string) ([]Account, error) {
 	var accounts []Account
 
 	for _, a := range confMap {
-		if a.IsBase()&& accountType == "base" {
+		if a.IsBase() && accountType == "base" {
 			accounts = append(accounts, a)
 		} else if !a.IsBase() && accountType == "cross" {
 			accounts = append(accounts, a)
@@ -101,4 +82,3 @@ func allowedTypes(accountType string) bool {
 
 	return false
 }
-

@@ -1,4 +1,4 @@
-// Copyright © 2018 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2018 Tim Colbert <admin@tcolbert.net>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import (
 	"github.com/manifoldco/promptui"
 	assumeAccount "github.com/s3than/assume/account"
 	"github.com/spf13/cobra"
+	"errors"
 )
 
 type accountType struct {
@@ -65,8 +66,6 @@ func addAccount() {
 		},
 	}
 
-
-	//{{"\"output\""}}
 	templates := &promptui.SelectTemplates{
 		Label:    "{{ . }}?",
 		Active:   "\u21D2 {{ .Name | cyan }} ({{ .Description | red }})",
@@ -110,14 +109,123 @@ func addAccount() {
 
 func promptBaseAccount() {
 
-	accounts, err := assumeAccount.FindAllbyType("base")
+	validateProfileName := func(input string) error {
 
-	if err != nil {
-		panic("Unable to unmarshal hosts")
+		err := validation.Validate(input,
+			validation.Required, // not empty
+			validation.Match(regexp.MustCompile("^[A-Za-z0-9_=,.@+-]*$")),
+			is.ASCII,
+		)
+
+		profileExists := assumeAccount.ProfileExists(input)
+
+		if profileExists == true {
+			return errors.New("profile already exists")
+		}
+
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
-	fmt.Printf("%+v", accounts)
+	promptProfile := promptui.Prompt{
+		Label:    "Profile Name",
+		Validate: validateProfileName,
+	}
 
+	profileName, err := promptProfile.Run()
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
+
+	validateAccessKey := func(input string) error {
+
+		err := validation.Validate(input,
+			validation.Required, // not empty
+			//validation.Match(regexp.MustCompile("(^|[^A-Z0-9])[A-Z0-9]{20}(?![A-Z0-9])")),
+			is.Alphanumeric,
+		)
+
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	promptAccessKey := promptui.Prompt{
+		Label:    "AWS Access Key Id",
+		Validate: validateAccessKey,
+	}
+
+	profileAccessKey, err := promptAccessKey.Run()
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
+
+	validateSecretKey := func(input string) error {
+
+		err := validation.Validate(input,
+			validation.Required, // not empty
+			//validation.Match(regexp.MustCompile("(^|[^A-Za-z0-9/+=])[A-Za-z0-9/+=]{40}(?![A-Za-z0-9/+=])")),
+			is.ASCII,
+		)
+
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	promptSecretKey := promptui.Prompt{
+		Label:    "AWS Secret Access Key",
+		Validate: validateSecretKey,
+	}
+
+	profileSecretAccess, err := promptSecretKey.Run()
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
+
+	validateSecret := func(input string) error {
+		err := validation.Validate(input,
+			//validation.Match(regexp.MustCompile("(?<![A-Z0-9])[A-Z0-9]{20}(?![A-Z0-9])")),
+			is.Alphanumeric,
+		)
+
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	promptSecret := promptui.Prompt{
+		Label:    "TOTP Secret",
+		Validate: validateSecret,
+		Mask:     '*',
+	}
+
+	profileSecret, err := promptSecret.Run()
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
+
+	newAccount := assumeAccount.Account{
+		ProfileName:profileName,
+		Secret: profileSecret,
+		AwsAccessKeyID: profileAccessKey,
+		AwsSecretAccessKey: profileSecretAccess,
+	}
+
+	assumeAccount.WriteAccountToConfig(newAccount)
 }
 
 func promptCrossAccount() {
@@ -128,20 +236,6 @@ func promptCrossAccount() {
 			validation.Required, // not empty
 			validation.Match(regexp.MustCompile("^[A-Za-z0-9_=,.@+-]*$")),
 			is.ASCII,
-		)
-
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	validateAWSAccount := func(input string) error {
-
-		err := validation.Validate(input,
-			validation.Required, // not empty
-			validation.Length(12, 12),
-			is.UTFNumeric,
 		)
 
 		if err != nil {
@@ -172,6 +266,20 @@ func promptCrossAccount() {
 	if err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
 		return
+	}
+
+	validateAWSAccount := func(input string) error {
+
+		err := validation.Validate(input,
+			validation.Required, // not empty
+			validation.Length(12, 12),
+			is.UTFNumeric,
+		)
+
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
 	promptAccount := promptui.Prompt{

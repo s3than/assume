@@ -2,7 +2,7 @@ package account
 
 //Account profile
 type Account struct {
-	ProfileName        string `mapstructure:"profile_name" yaml:"profile_name,omitempty"`
+	ProfileName        string `mapstructure:"profile_name" yaml:"profile_name"`
 	AwsAccessKeyID     string `mapstructure:"aws_access_key_id" yaml:"aws_access_key_id,omitempty"`
 	AwsSecretAccessKey string `mapstructure:"aws_secret_access_key" yaml:"aws_secret_access_key,omitempty"`
 	Region             string `yaml:"region,omitempty"`
