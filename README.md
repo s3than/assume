@@ -13,8 +13,10 @@ Create a config file that can be used in the format from aws-extend-switch-roles
     secret = TOTP_SECRET
     region = ap-southeast-2
 
+    [profile child]
+    role_arn = arn:aws:iam::xxxxxxxxxxxx:role/role-name
+    source_profile = master
 
-[![Codefresh build status]( https://g.codefresh.io/api/badges/build?repoOwner=s3than&repoName=assume&branch=master&pipelineName=assume&accountName=s3than&type=cf-1)]( https://g.codefresh.io/repositories/s3than/assume/builds?filter=trigger:build;branch:master;service:5a14ca51907b050001a46ac0~assume)
 
 <!-- ### Prerequisites
 
