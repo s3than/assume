@@ -16,7 +16,7 @@ package main
 
 import (
 	"errors"
-	"flag"
+	flag "github.com/ogier/pflag"
 	"fmt"
 	"math/rand"
 	"os"
@@ -32,11 +32,14 @@ import (
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/go-ini/ini"
 	"github.com/pquerna/otp/totp"
+	"strings"
+	//"github.com/davecgh/go-spew/spew"
 )
 
 // AwsAccount struct to hold base account details
 type AwsAccount struct {
 	region          string
+	profileName         string
 	accessKeyID     string
 	secretAccessKey string
 }
@@ -57,32 +60,56 @@ type AssumeCredentials struct {
 	mfaToken MfaToken
 }
 
-var configPath string
-var configCredsPath string
-
 var defaultConfig = "/.config/assume/config.ini"
 var defaultCreds = "/.config/assume/config.creds"
 
+var usr, err = user.Current()
+var configFilePath = usr.HomeDir + "/.aws/config"
+var credFilePath = usr.HomeDir + "/.aws/credentials"
+
 func main() {
 
-	config := flag.String(
+	var configCredsPath string
+	var configPath string
+	var accountRef string
+
+	config := flag.StringP(
 		"config",
+		"s",
 		"",
 		"config file (default is $HOME/.config/assume/config.ini)",
 	)
-	configCreds := flag.String(
+	configCreds := flag.StringP(
 		"credentials",
+		"c",
 		"",
 		"credentials file (default is $HOME/.config/assume/config.creds)",
-	) // for naming bucket
-	accountRef := flag.String(
+	)
+
+	// Account to assume, can use cli argument instead
+	account := flag.StringP(
 		"account",
+		"a",
 		"default",
 		"AWS account reference",
 	)
+
+	saveProfile := flag.StringP(
+		"profile",
+		"p",
+		"default",
+		"AWS account profile to save as.",
+	)
+
 	flag.Parse()
 
-	usr, err := user.Current()
+	// Allow argument for account as well as -account
+
+	accountRef = os.Args[1]
+	if strings.HasPrefix(accountRef, "-") {
+		accountRef = *account
+	}
+
 	if err != nil {
 		fmt.Printf("%+v", err)
 		os.Exit(1)
@@ -111,7 +138,7 @@ func main() {
 	os.OpenFile(configCredsPath, os.O_CREATE, 0666)
 	configFile.Append(configCredsPath)
 
-	creds, err := getCredentials(configFile, *accountRef, AssumeCredentials{})
+	creds, err := getCredentials(configFile, accountRef, AssumeCredentials{})
 
 	if creds.profile != "" {
 		creds, err = getCredentials(configFile, creds.profile, creds)
@@ -132,9 +159,10 @@ func main() {
 		}
 
 		if awsCreds != nil {
+			creds.account.profileName = *saveProfile
 			account := creds.account
 
-			err = writeFile(awsCreds, usr, account.region)
+			err = writeFile(awsCreds, account)
 
 			if err != nil {
 				fmt.Printf("%+v", err)
@@ -147,40 +175,37 @@ func main() {
 	}
 }
 
-func writeFile(awsCreds *sts.Credentials, usr *user.User, region string) error {
-	credFilePath := usr.HomeDir + "/.aws/credentials"
-
+func writeFile(awsCreds *sts.Credentials, account AwsAccount) error {
 	os.OpenFile(credFilePath, os.O_CREATE, 0666)
 	credFile, err := ini.Load(credFilePath)
 	if err != nil {
 		return err
 	}
-	credSect, err := credFile.NewSection("default")
+	credSect, err := credFile.NewSection(account.profileName)
 	if err != nil {
 		return err
 	}
 	credSect.NewKey("aws_access_key_id", *awsCreds.AccessKeyId)
 	credSect.NewKey("aws_secret_access_key", *awsCreds.SecretAccessKey)
 	credSect.NewKey("aws_session_token", *awsCreds.SessionToken)
-	// Legacy support for boto apps
+	// Legacy support for boto2 apps
 	credSect.NewKey("aws_security_token", *awsCreds.SessionToken)
-	credSect.NewKey("region", region)
+	credSect.NewKey("region", account.region)
 	credSect.NewKey("output", "json")
 
 	credFile.SaveTo(credFilePath)
 
 	// Config file details
-	configFilePath := usr.HomeDir + "/.aws/config"
 	os.OpenFile(configFilePath, os.O_CREATE, 0666)
 	configFile, err := ini.Load(configFilePath)
 	if err != nil {
 		return err
 	}
-	configSect, err := configFile.NewSection("default")
+	configSect, err := configFile.NewSection(account.profileName)
 	if err != nil {
 		return err
 	}
-	configSect.NewKey("region", region)
+	configSect.NewKey("region", account.region)
 	configSect.NewKey("output", "json")
 	configFile.SaveTo(configFilePath)
 
