@@ -16,12 +16,15 @@ package main
 
 import (
 	"errors"
-	flag "github.com/ogier/pflag"
 	"fmt"
 	"math/rand"
 	"os"
 	"os/user"
 	"time"
+
+	flag "github.com/ogier/pflag"
+
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/client"
@@ -32,14 +35,12 @@ import (
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/go-ini/ini"
 	"github.com/pquerna/otp/totp"
-	"strings"
-	//"github.com/davecgh/go-spew/spew"
 )
 
 // AwsAccount struct to hold base account details
 type AwsAccount struct {
 	region          string
-	profileName         string
+	profileName     string
 	accessKeyID     string
 	secretAccessKey string
 }
@@ -105,13 +106,15 @@ func main() {
 
 	// Allow argument for account as well as -account
 
-	accountRef = os.Args[1]
-	if strings.HasPrefix(accountRef, "-") {
-		accountRef = *account
+	if len(os.Args) > 1 {
+		accountRef = os.Args[1]
+		if strings.HasPrefix(accountRef, "-") {
+			accountRef = *account
+		}
 	}
 
 	if err != nil {
-		fmt.Printf("%+v", err)
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
@@ -131,7 +134,7 @@ func main() {
 	configFile, err := ini.Load(configPath)
 
 	if err != nil {
-		fmt.Printf("%+v", err)
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
@@ -145,7 +148,7 @@ func main() {
 	}
 
 	if err != nil {
-		fmt.Printf("%+v", err)
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
@@ -154,7 +157,7 @@ func main() {
 		awsCreds, err = assumeRole(creds)
 
 		if err != nil {
-			fmt.Printf("%+v", err)
+			fmt.Println(err)
 			os.Exit(1)
 		}
 
@@ -165,7 +168,7 @@ func main() {
 			err = writeFile(awsCreds, account)
 
 			if err != nil {
-				fmt.Printf("%+v", err)
+				fmt.Println(err)
 				os.Exit(1)
 			}
 
