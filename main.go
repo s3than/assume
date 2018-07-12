@@ -235,6 +235,7 @@ func assumeRole(creds AssumeCredentials) (*sts.Credentials, error) {
 		return assumeRoleOutput.Credentials, err
 	case mfaToken.serialNumber != "" && creds.profile == "":
 		sessionTokenOutput, err = sts.New(creds.session).GetSessionToken(&sts.GetSessionTokenInput{
+			DurationSeconds:aws.Int64(43200),
 			SerialNumber: aws.String(mfaToken.serialNumber),
 			TokenCode:    aws.String(mfaToken.tokenCode),
 		})
@@ -246,7 +247,9 @@ func assumeRole(creds AssumeCredentials) (*sts.Credentials, error) {
 		})
 		return assumeRoleOutput.Credentials, err
 	case mfaToken.serialNumber == "" && creds.profile == "":
-		sessionTokenOutput, err = sts.New(creds.session).GetSessionToken(&sts.GetSessionTokenInput{})
+		sessionTokenOutput, err = sts.New(creds.session).GetSessionToken(&sts.GetSessionTokenInput{
+			DurationSeconds:aws.Int64(43200),
+		})
 		return sessionTokenOutput.Credentials, err
 	}
 
