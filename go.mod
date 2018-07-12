@@ -1,7 +1,7 @@
 module github.com/s3than/assume
 
 require (
-	github.com/aws/aws-sdk-go v1.12.26
+	github.com/aws/aws-sdk-go v1.1.0
 	github.com/boombuler/barcode v0.0.0-20170922103352-3cfea5ab600a
 	github.com/go-ini/ini v1.30.3
 	github.com/gopherjs/gopherjs v0.0.0-20180628210949-0892b62f0d9f

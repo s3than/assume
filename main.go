@@ -16,12 +16,15 @@ package main
 
 import (
 	"errors"
-	flag "github.com/ogier/pflag"
 	"fmt"
 	"math/rand"
 	"os"
 	"os/user"
 	"time"
+
+	flag "github.com/ogier/pflag"
+
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/client"
@@ -32,14 +35,12 @@ import (
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/go-ini/ini"
 	"github.com/pquerna/otp/totp"
-	"strings"
-	//"github.com/davecgh/go-spew/spew"
 )
 
 // AwsAccount struct to hold base account details
 type AwsAccount struct {
 	region          string
-	profileName         string
+	profileName     string
 	accessKeyID     string
 	secretAccessKey string
 }
@@ -232,6 +233,7 @@ func assumeRole(creds AssumeCredentials) (*sts.Credentials, error) {
 		return assumeRoleOutput.Credentials, err
 	case mfaToken.serialNumber != "" && creds.profile == "":
 		sessionTokenOutput, err = sts.New(creds.session).GetSessionToken(&sts.GetSessionTokenInput{
+			DurationSeconds:aws.Int64(43200),
 			SerialNumber: aws.String(mfaToken.serialNumber),
 			TokenCode:    aws.String(mfaToken.tokenCode),
 		})
@@ -243,7 +245,9 @@ func assumeRole(creds AssumeCredentials) (*sts.Credentials, error) {
 		})
 		return assumeRoleOutput.Credentials, err
 	case mfaToken.serialNumber == "" && creds.profile == "":
-		sessionTokenOutput, err = sts.New(creds.session).GetSessionToken(&sts.GetSessionTokenInput{})
+		sessionTokenOutput, err = sts.New(creds.session).GetSessionToken(&sts.GetSessionTokenInput{
+			DurationSeconds:aws.Int64(43200),
+		})
 		return sessionTokenOutput.Credentials, err
 	}
 
