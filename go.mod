@@ -1,10 +1,11 @@
 module github.com/s3than/assume
 
 require (
-	github.com/aws/aws-sdk-go v1.1.0
+	github.com/aws/aws-sdk-go v1.14.25
 	github.com/boombuler/barcode v0.0.0-20170922103352-3cfea5ab600a
 	github.com/go-ini/ini v1.30.3
 	github.com/gopherjs/gopherjs v0.0.0-20180628210949-0892b62f0d9f
+	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
 	github.com/jtolds/gls v0.0.0-20170503224851-77f18212c9c7
 	github.com/ogier/pflag v0.0.1
 	github.com/pquerna/otp v1.0.0
