@@ -70,11 +70,11 @@ func main() {
 					profileName,
 				})
 		case expiration != false:
-			fmt.Println(remainingTime(cfg, account))
+			fmt.Println(remainingTime(cfg, profileName))
 		case returnProfile != false:
-			fmt.Println(returnProfileName(cfg, account))
+			fmt.Println(returnProfileName(cfg, profileName))
 		case returnNameExpiration != false:
-			fmt.Print(returnProfileName(cfg, account) + " " + remainingTime(cfg, account))
+			fmt.Print(returnProfileName(cfg, profileName) + " " + remainingTime(cfg, profileName))
 		default:
 			return flag.ErrHelp
 		}

@@ -101,9 +101,8 @@ func writeFile(a *sts.Credentials, c credentials, p string) error {
 		Expiration:      *a.Expiration,
 	}
 
-	if p == "default" {
-		wc.NamedProfile = c.NamedProfile
-	}
+	wc.NamedProfile = c.NamedProfile
+
 	os.OpenFile(credFilePath, os.O_CREATE, 0666)
 	cfg, err := ini.Load(credFilePath)
 	if err != nil {
