@@ -18,7 +18,7 @@ var (
 	configFile           string
 	credFile             string
 	profileName          string
-	returnProfile           bool
+	returnProfile        bool
 	expiration           bool
 	returnNameExpiration bool
 	usr, _               = user.Current()
@@ -59,6 +59,7 @@ func main() {
 		if len(strings) > 0 {
 			account = strings[0]
 		}
+		sect := cfg.Section(profileName)
 
 		switch {
 		case returnProfile == false &&
@@ -70,11 +71,17 @@ func main() {
 					profileName,
 				})
 		case expiration != false:
-			fmt.Println(remainingTime(cfg, profileName))
+			if sect.HasKey("expiration") {
+				fmt.Println(remainingTime(sect))
+			}
 		case returnProfile != false:
-			fmt.Println(returnProfileName(cfg, profileName))
+			if sect.HasKey("named_profile") {
+				fmt.Println(returnProfileName(sect))
+			}
 		case returnNameExpiration != false:
-			fmt.Print(returnProfileName(cfg, profileName) + " " + remainingTime(cfg, profileName))
+			if sect.HasKey("named_profile") && sect.HasKey("expiration"){
+				fmt.Print(returnProfileName(sect) + " " + remainingTime(sect))
+			}
 		default:
 			return flag.ErrHelp
 		}
@@ -86,29 +93,26 @@ func main() {
 	p.Run()
 }
 
-func returnProfileName(cfg *ini.File, account string) string {
-	sect := cfg.Section(account)
+func returnProfileName(sect *ini.Section) string {
 	namedProfile := sect.Key("named_profile").String()
 
-	if !expired(cfg, account) {
+	if !expired(sect) {
 		return color.RedString(namedProfile)
 	}
 	return color.GreenString(namedProfile)
 }
 
-func remainingTime(cfg *ini.File, account string) string {
-	sect := cfg.Section(account)
+func remainingTime(sect *ini.Section) string {
 	expiration, _ := sect.Key("expiration").Time()
 	h, m := fmtDuration(time.Until(expiration))
 
-	if !expired(cfg, account) {
+	if !expired(sect) {
 		return color.RedString("%02dh:%02dm", h, m)
 	}
 	return color.GreenString("%02dh:%02dm", h, m)
 }
 
-func expired(cfg *ini.File, account string) bool {
-	sect := cfg.Section(account)
+func expired(sect *ini.Section) bool {
 	expiration, _ := sect.Key("expiration").Time()
 	h, m := fmtDuration(time.Until(expiration))
 

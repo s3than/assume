@@ -45,6 +45,7 @@ func assumeCommand(args arguments) {
 	config, err := getCredentials(args)
 
 	if err != nil {
+		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
@@ -73,7 +74,11 @@ func getCredentials(args arguments) (credentials, error) {
 		return c, err
 	}
 	cfg.Append(credFile)
-	err = cfg.Section(a).MapTo(&c)
+	sect, err := cfg.GetSection(a)
+	if err != nil {
+		return c, err
+	}
+	err = sect.MapTo(&c)
 
 	if !strings.HasPrefix(a, "profile") {
 		err = cfg.Section("profile " + a).MapTo(&c)
@@ -134,7 +139,6 @@ func generateCredentials(c credentials) (*sts.Credentials, error) {
 
 	s, err := session(c)
 	t, err := mfaToken(s, c.MfaSecret)
-
 	switch {
 	case c.SourceProfile != "":
 		if c.Duration == 0 {
