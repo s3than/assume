@@ -1,42 +1,32 @@
 # ---
 # Go Builder Image
-FROM golang:1.8-alpine AS builder
-
-# set build arguments: GitHub user and repository
-ARG GH_USER
-ARG GH_REPO
-ARG GH_VERSION
+FROM golang:1.11-alpine AS builder
 
 # Create and set working directory
-RUN mkdir -p /go/src/github.com/$GH_USER/$GH_REPO
-WORKDIR /go/src/github.com/$GH_USER/$GH_REPO
+WORKDIR /app
 
 # copy sources
 COPY . .
 
-RUN apk add --no-cache wget && \
-  cd /tmp && \
-  wget https://github.com/golang/dep/releases/download/$GH_VERSION/dep-linux-amd64 && \
-  mv /tmp/dep-linux-amd64 /usr/bin/dep && \
-  chmod +x /usr/bin/dep && \
-  cd /go/src/github.com/$GH_USER/$GH_REPO && \
-  dep ensure
+ENV CGO_ENABLED=0
+ENV GO111MODULE=on
+ENV GOOS=linux
+ENV GOARCH=amd64
 
-# Run tests, skip 'vendor'
-RUN go test -v $(go list ./... | grep -v /vendor/)
+RUN apk --no-cache add git
 
-# Build application
-RUN CGO_ENABLED=0 go build -v -o "main.go"
+RUN name=$(basename "$dir") \
+    set -x && \
+    go build -a \
+    -installsuffix cgo \
+    -ldflags "-w -s" \
+    -o "$name" .
 
 # ---
 # Application Runtime Image
-FROM alpine:3.6
+FROM alpine:3.8
 
-# set build arguments: GitHub user and repository
-ARG GH_USER
-ARG GH_REPO
-
-# copy file from builder image
-COPY --from=builder /go/src/github.com/$GH_USER/$GH_REPO/assume /usr/bin/assume
+# Copy from builder
+COPY --from=builder /app/assume /usr/bin/assume
 
 CMD ["assume", "--help"]

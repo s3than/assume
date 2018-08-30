@@ -2,9 +2,30 @@
 
 Command line application to assume a role using a config.ini and config.creds file, the config.ini utilises the same file format as [aws-extend-switch-roles](https://github.com/tilfin/aws-extend-switch-roles). This then merges a config.creds file to authorise assume roles
 
+
+    assume -  Command line tool to set AWS assume role credentials within the aws credentials files.
+
+    Usage: assume <command>
+
+    Flags:
+
+      --config  config file (default is $HOME/.config/assume/config.ini) (default: /home/tim/.config/assume/config.ini)
+      --cred    credentials file (default is $HOME/.config/assume/config.creds) (default: /home/tim/.config/assume/config.creds)
+      -d        return name of profile (default: false)
+      --dt      return expiration time and name of profile (default: false)
+      -p        set as named profile (default: default)
+      -t        return expiration time of profile (default: false)
+
+    Commands:
+
+      version  Show the version information.
+
+
 ## Getting Started
 
 Create a config file that can be used in the format from aws-extend-switch-roles, create a config.creds file with the following values.
+
+If duration is set it will attempt to create the session with that duration
 
     # Master account
     [profile master]
@@ -12,6 +33,7 @@ Create a config file that can be used in the format from aws-extend-switch-roles
     aws_secret_access_key = AWS_SECRET_ACCESS_KEY
     secret = TOTP_SECRET
     region = ap-southeast-2
+    duration = 43200
 
     [profile child]
     role_arn = arn:aws:iam::xxxxxxxxxxxx:role/role-name

@@ -1,19 +1,23 @@
 module github.com/s3than/assume
 
 require (
-	github.com/aws/aws-sdk-go v1.14.25
-	github.com/boombuler/barcode v0.0.0-20170922103352-3cfea5ab600a
-	github.com/go-ini/ini v1.30.3
-	github.com/gopherjs/gopherjs v0.0.0-20180628210949-0892b62f0d9f
-	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
-	github.com/jtolds/gls v0.0.0-20170503224851-77f18212c9c7
-	github.com/ogier/pflag v0.0.1
+	github.com/aws/aws-sdk-go v1.15.24
+	github.com/boombuler/barcode v1.0.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/fatih/color v1.7.0
+	github.com/genuinetools/pkg v0.0.0-20180724152157-4038376dadd5
+	github.com/go-ini/ini v1.38.2
+	github.com/gopherjs/gopherjs v0.0.0-20180825215210-0210a2f0f73c // indirect
+	github.com/jtolds/gls v4.2.1+incompatible // indirect
+	github.com/mattn/go-colorable v0.0.9 // indirect
+	github.com/mattn/go-isatty v0.0.3 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/pquerna/otp v1.0.0
-	github.com/smartystreets/assertions v0.0.0-20180607162144-eb5b59917fa2
-	github.com/smartystreets/goconvey v0.0.0-20180222194500-ef6db91d284a
-	github.com/smartystreets/gunit v0.0.0-20180314194857-6f0d6275bdcd
-	github.com/stretchr/testify v1.2.2
-	golang.org/x/net v0.0.0-20180629035331-4cb1c02c05b0
-	golang.org/x/text v0.3.0
-	gopkg.in/ini.v1 v1.37.0
+	github.com/smartystreets/assertions v0.0.0-20180820201707-7c9eb446e3cf // indirect
+	github.com/smartystreets/goconvey v0.0.0-20180222194500-ef6db91d284a // indirect
+	github.com/stretchr/testify v1.2.2 // indirect
+	golang.org/x/net v0.0.0-20180826012351-8a410e7b638d // indirect
+	golang.org/x/sys v0.0.0-20180828065106-d99a578cf41b // indirect
+	golang.org/x/text v0.3.0 // indirect
+	gopkg.in/ini.v1 v1.38.2 // indirect
 )
