@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -63,6 +62,17 @@ func assumeCommand(args arguments) {
 	os.Exit(0)
 }
 
+func getSection(cfg *ini.File, a string) (*ini.Section, error){
+
+	sect, err := cfg.GetSection(a)
+	if err != nil {
+		// Check for profile prefix in ini
+		sect, err = cfg.GetSection("profile " + a)
+	}
+
+	return sect, err
+}
+
 func getCredentials(args arguments) (credentials, error) {
 	var err error
 	var a = args.account
@@ -74,23 +84,19 @@ func getCredentials(args arguments) (credentials, error) {
 		return c, err
 	}
 	cfg.Append(credFile)
-	sect, err := cfg.GetSection(a)
+
+	sect, err := getSection(cfg, a)
 	if err != nil {
 		return c, err
 	}
 	err = sect.MapTo(&c)
-
-	if !strings.HasPrefix(a, "profile") {
-		err = cfg.Section("profile " + a).MapTo(&c)
-	}
-
 	if c.SourceProfile != "" {
-		err = cfg.Section(c.SourceProfile).MapTo(&c)
-		if !strings.HasPrefix(c.SourceProfile, "profile") {
-			err = cfg.Section("profile " + c.SourceProfile).MapTo(&c)
+		sect, err := getSection(cfg, c.SourceProfile)
+		if err != nil {
+			return c, err
 		}
+		err = sect.MapTo(&c)
 	}
-
 	return c, err
 }
 
