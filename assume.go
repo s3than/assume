@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -31,6 +31,18 @@ type credentials struct {
 	SecurityToken   string    `ini:"aws_security_token,omitempty"`
 	Output          string    `ini:"output,omitempty"`
 	NamedProfile    string    `ini:"named_profile,omitempty"`
+}
+
+// Components encapsulate the individual pieces of an AWS ARN.
+type components struct {
+	ARN               string
+	Partition         string
+	Service           string
+	Region            string
+	AccountID         string
+	ResourceType      string
+	Resource          string
+	ResourceDelimiter string
 }
 
 // MfaToken token configuration
@@ -62,7 +74,7 @@ func assumeCommand(args arguments) {
 	os.Exit(0)
 }
 
-func getSection(cfg *ini.File, a string) (*ini.Section, error){
+func getSection(cfg *ini.File, a string) (*ini.Section, error) {
 
 	sect, err := cfg.GetSection(a)
 	if err != nil {
@@ -138,21 +150,75 @@ func writeFile(a *sts.Credentials, c credentials, p string) error {
 	return err
 }
 
+func validate(arn string, pieces []string) error {
+	if strings.Contains(arn, "${") {
+		return errors.New("policy variables are not supported")
+	}
+	if len(pieces) < 6 {
+		return errors.New("malformed ARN")
+	}
+	return nil
+}
+
+// Parse accepts and ARN string and attempts to break it into constituent parts.
+func parse(arn string) (*components, error) {
+	pieces := strings.SplitN(arn, ":", 6)
+
+	if err := validate(arn, pieces); err != nil {
+		return nil, err
+	}
+
+	components := &components{
+		ARN:       pieces[0],
+		Partition: pieces[1],
+		Service:   pieces[2],
+		Region:    pieces[3],
+		AccountID: pieces[4],
+	}
+	if n := strings.Count(pieces[5], ":"); n > 0 {
+		components.ResourceDelimiter = ":"
+		resourceParts := strings.SplitN(pieces[5], ":", 2)
+		components.ResourceType = resourceParts[0]
+		components.Resource = resourceParts[1]
+	} else {
+		if m := strings.Count(pieces[5], "/"); m == 0 {
+			components.Resource = pieces[5]
+		} else {
+			components.ResourceDelimiter = "/"
+			resourceParts := strings.SplitN(pieces[5], "/", 2)
+			components.ResourceType = resourceParts[0]
+			components.Resource = resourceParts[1]
+		}
+	}
+	return components, nil
+}
+
 func generateCredentials(c credentials) (*sts.Credentials, error) {
 
 	var err error
 	var output interface{}
 
 	s, err := session(c)
+	stsSession := sts.New(s)
+
+	callerIdentity, err := stsSession.GetCallerIdentity(&sts.GetCallerIdentityInput{})
+	component, err := parse(*callerIdentity.Arn)
+
 	t, err := mfaToken(s, c.MfaSecret)
+
+	if err != nil {
+		return nil, err
+	}
+
 	switch {
 	case c.SourceProfile != "":
 		if c.Duration == 0 {
 			c.Duration = 3600
 		}
-		output, err = sts.New(s).AssumeRole(&sts.AssumeRoleInput{
+
+		output, err = stsSession.AssumeRole(&sts.AssumeRoleInput{
 			RoleArn:         aws.String(c.RoleArn),
-			RoleSessionName: aws.String(randStringBytesMaskSrc(6)),
+			RoleSessionName: aws.String(component.Resource + "-cli"),
 			SerialNumber:    aws.String(t.serialNumber),
 			TokenCode:       aws.String(t.tokenCode),
 			DurationSeconds: aws.Int64(c.Duration),
@@ -161,7 +227,7 @@ func generateCredentials(c credentials) (*sts.Credentials, error) {
 		if c.Duration == 0 {
 			c.Duration = 43200
 		}
-		output, err = sts.New(s).GetSessionToken(&sts.GetSessionTokenInput{
+		output, err = stsSession.GetSessionToken(&sts.GetSessionTokenInput{
 			DurationSeconds: aws.Int64(c.Duration),
 			SerialNumber:    aws.String(t.serialNumber),
 			TokenCode:       aws.String(t.tokenCode),
@@ -222,32 +288,4 @@ func session(c credentials) (*awsSession.Session, error) {
 	}
 
 	return s, nil
-}
-
-var src = rand.NewSource(time.Now().UnixNano())
-
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-const (
-	letterIdxBits = 6                    // 6 bits to represent a letter index
-	letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
-	letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
-)
-
-// randStringBytesMaskSrc generate random string
-func randStringBytesMaskSrc(n int) string {
-	b := make([]byte, n)
-	// A src.Int63() generates 63 random bits, enough for letterIdxMax characters!
-	for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
-		if remain == 0 {
-			cache, remain = src.Int63(), letterIdxMax
-		}
-		if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
-			b[i] = letterBytes[idx]
-			i--
-		}
-		cache >>= letterIdxBits
-		remain--
-	}
-
-	return string(b)
 }
