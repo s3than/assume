@@ -1,32 +1,28 @@
-# ---
-# Go Builder Image
-FROM golang:1.11-alpine AS builder
+FROM golang:alpine as builder
+MAINTAINER Tim Colbert <admin@tcolbert.net>
 
-# Create and set working directory
-WORKDIR /app
+ENV PATH /go/bin:/usr/local/go/bin:$PATH
+ENV GOPATH /go
 
-# copy sources
-COPY . .
+COPY . /go/src/github.com/s3than/assume
 
-ENV CGO_ENABLED=0
-ENV GO111MODULE=on
-ENV GOOS=linux
-ENV GOARCH=amd64
+RUN set -x \
+	&& apk add --no-cache --virtual .build-deps \
+		git \
+		gcc \
+		libc-dev \
+		libgcc \
+		make \
+	&& cd /go/src/github.com/s3than/assume \
+	&& make static \
+	&& mv assume /usr/bin/assume \
+	&& apk del .build-deps \
+	&& rm -rf /go \
+	&& echo "Build complete."
 
-RUN apk --no-cache add git
+FROM alpine:latest
 
-RUN name=$(basename "$dir") \
-    set -x && \
-    go build -a \
-    -installsuffix cgo \
-    -ldflags "-w -s" \
-    -o "$name" .
+COPY --from=builder /usr/bin/assume /usr/bin/assume
 
-# ---
-# Application Runtime Image
-FROM alpine:3.8
-
-# Copy from builder
-COPY --from=builder /app/assume /usr/bin/assume
-
-CMD ["assume", "--help"]
+ENTRYPOINT [ "assume" ]
+CMD [ "--help" ]

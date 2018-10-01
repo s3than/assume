@@ -1,4 +1,8 @@
 assume
-vendor/
-.vscode/
-pkg/
+cross/
+
+# Go coverage results
+coverage.txt
+profile.out
+
+!go.mod
