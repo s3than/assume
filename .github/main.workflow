@@ -2,10 +2,10 @@ workflow "New workflow" {
   on = "push"
   resolves = [
     "Filters",
-    "Docker Login",
     "Docker Build",
     "Docker Tag",
-    "Docker Push"
+    "Docker Push",
+    "release linux/amd64",
   ]
 }
 
@@ -36,4 +36,14 @@ action "Docker Push" {
   uses = "actions/docker/cli@aea64bb1b97c42fa69b90523667fef56b90d7cff"
   needs = ["Docker Tag"]
   args = "push s3than/assume"
+}
+
+action "release linux/amd64" {
+  uses = "ngs/go-release.action@v1.0.1"
+  env = {
+    GOOS = "linux"
+    GOARCH = "amd64"
+  }
+  needs = ["Filters"]
+  secrets = ["GITHUB_TOKEN"]
 }
