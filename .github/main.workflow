@@ -1,8 +1,11 @@
 workflow "New workflow" {
   on = "push"
   resolves = [
-    "GitHub Action for Docker-1",
+    "Filters",
+    "Docker Login",
+    "Docker Build",
     "Docker Tag",
+    "Docker Push"
   ]
 }
 
@@ -11,7 +14,7 @@ action "Filters" {
   args = "tag"
 }
 
-action ""Docker Login" {
+action "Docker Login" {
   uses = "actions/docker/login@master"
   needs = ["Filters"]
   secrets = ["DOCKER_USERNAME", "DOCKER_PASSWORD"]
