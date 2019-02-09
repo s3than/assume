@@ -1,27 +1,36 @@
 workflow "New workflow" {
   on = "push"
-  resolves = ["GitHub Action for Docker-1"]
+  resolves = [
+    "GitHub Action for Docker-1",
+    "Docker Tag",
+  ]
 }
 
-action "Filters for GitHub Actions" {
+action "Filters" {
   uses = "actions/bin/filter@9d4ef995a71b0771f438dd7438851858f4a55d0c"
   args = "tag"
 }
 
-action "GitHub Action for Docker" {
-  uses = "actions/docker/cli@aea64bb1b97c42fa69b90523667fef56b90d7cff"
-  needs = ["Filters for GitHub Actions"]
-  args = "build -t s3than/assume:${GITHUB_REF} ."
-}
-
-action "Docker Login" {
+action ""Docker Login" {
   uses = "actions/docker/login@master"
-  needs = ["GitHub Action for Docker"]
+  needs = ["Filters"]
   secrets = ["DOCKER_USERNAME", "DOCKER_PASSWORD"]
 }
 
-action "GitHub Action for Docker-1" {
+action "Docker Build" {
   uses = "actions/docker/cli@aea64bb1b97c42fa69b90523667fef56b90d7cff"
   needs = ["Docker Login"]
-  args = "push s3than/assume:${GITHUB_REF}"
+  args = "build -t assume ."
+}
+
+action "Docker Tag" {
+  uses = "actions/docker/tag@aea64bb1b97c42fa69b90523667fef56b90d7cff"
+  needs = ["Docker Build"]
+  args = "assume s3than/assume"
+}
+
+action "Docker Push" {
+  uses = "actions/docker/cli@aea64bb1b97c42fa69b90523667fef56b90d7cff"
+  needs = ["Docker Tag"]
+  args = "push s3than/assume"
 }
