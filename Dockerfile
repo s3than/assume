@@ -4,7 +4,7 @@ MAINTAINER Tim Colbert <admin@tcolbert.net>
 ENV PATH /go/bin:/usr/local/go/bin:$PATH
 ENV GOPATH /go
 
-COPY . /go/src/github.com/s3than/assume
+COPY . /app
 
 RUN set -x \
 	&& apk add --no-cache --virtual .build-deps \
