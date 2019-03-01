@@ -4,6 +4,6 @@ cross/
 # Go coverage results
 coverage.txt
 profile.out
-
+dist/
 !go.mod
 .idea
