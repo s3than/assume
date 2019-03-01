@@ -1,6 +1,6 @@
 assume
 cross/
-
+vendor/
 # Go coverage results
 coverage.txt
 profile.out

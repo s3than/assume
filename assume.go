@@ -126,26 +126,53 @@ func writeFile(a *sts.Credentials, c credentials, p string) error {
 
 	wc.NamedProfile = c.NamedProfile
 
-	os.OpenFile(credFilePath, os.O_CREATE, 0666)
+	_, err := os.OpenFile(credFilePath, os.O_CREATE, 0666)
+
+	if err != nil {
+		return err
+	}
+
 	cfg, err := ini.Load(credFilePath)
 	if err != nil {
 		return err
 	}
 	credSect, err := cfg.NewSection(p)
 	err = credSect.ReflectFrom(wc)
-	cfg.SaveTo(credFilePath)
+	err = cfg.SaveTo(credFilePath)
+	if err != nil {
+		return err
+	}
 
-	os.OpenFile(configFilePath, os.O_CREATE, 0666)
+	_, err = os.OpenFile(configFilePath, os.O_CREATE, 0666)
+
+	if err != nil {
+		return err
+	}
+
 	cfg, err = ini.Load(configFilePath)
 	if err != nil {
 		return err
 	}
 	credSect, err = cfg.NewSection(p)
+
+	if err != nil {
+		return err
+	}
+
 	err = credSect.ReflectFrom(&credentials{
 		Region: c.Region,
 		Output: "json",
 	})
-	cfg.SaveTo(configFilePath)
+
+	if err != nil {
+		return err
+	}
+
+	err = cfg.SaveTo(configFilePath)
+
+	if err != nil {
+		return err
+	}
 
 	return err
 }
@@ -202,7 +229,16 @@ func generateCredentials(c credentials) (*sts.Credentials, error) {
 	stsSession := sts.New(s)
 
 	callerIdentity, err := stsSession.GetCallerIdentity(&sts.GetCallerIdentityInput{})
+
+	if err != nil {
+		return nil, err
+	}
+
 	component, err := parse(*callerIdentity.Arn)
+
+	if err != nil {
+		return nil, err
+	}
 
 	t, err := mfaToken(s, c.MfaSecret)
 
