@@ -1,8 +1,6 @@
 FROM golang:alpine as builder
-MAINTAINER Tim Colbert <admin@tcolbert.net>
 
-ENV PATH /go/bin:/usr/local/go/bin:$PATH
-ENV GOPATH /go
+WORKDIR /app
 
 COPY . /app
 
@@ -13,7 +11,6 @@ RUN set -x \
 		libc-dev \
 		libgcc \
 		make \
-	&& cd /go/src/github.com/s3than/assume \
 	&& make static \
 	&& mv assume /usr/bin/assume \
 	&& apk del .build-deps \

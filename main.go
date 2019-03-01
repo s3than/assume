@@ -54,7 +54,12 @@ func main() {
 	p.FlagSet.BoolVar(&returnNameExpiration, "dt", false, "return expiration time and name of profile")
 
 	p.Action = func(i context.Context, strings []string) error {
-		cfg, _ := ini.Load(credFilePath)
+		cfg, err := ini.Load(credFilePath)
+
+		if err != nil {
+			return err
+		}
+
 		account := "default"
 		if len(strings) > 0 {
 			account = strings[0]

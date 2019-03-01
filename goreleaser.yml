@@ -14,7 +14,7 @@ builds:
     # Custom ldflags templates.
     # Default is `-s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.Date}}`.
     ldflags:
-      - -w -X version.GITCOMMIT={{.ShortCommit}} -X version.VERSION={{.Version}} -extldflags -static
+      - -w -X github.com/s3than/assume/version.GITCOMMIT={{.ShortCommit}} -X github.com/s3than/assume/version.VERSION={{.Version}} -extldflags -static
 
     # Custom environment variables to be set during the builds.
     # Default is empty.
