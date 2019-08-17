@@ -1,4 +1,4 @@
-on: release
+on: [release]
 name: Deploy
 jobs:
   filters:
