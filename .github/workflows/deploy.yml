@@ -1,4 +1,4 @@
-on: push
+on: release
 name: Deploy
 jobs:
   filters:
@@ -6,10 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Filters
-        uses: actions/bin/filter@9d4ef995a71b0771f438dd7438851858f4a55d0c
-        with:
-          args: tag
       - name: Docker Login
         uses: actions/docker/login@master
         env:
