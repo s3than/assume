@@ -1,5 +1,5 @@
 on: push
-name: New workflow
+name: Deploy
 jobs:
   filters:
     name: Filters
