@@ -67,24 +67,24 @@ func main() {
 		sect := cfg.Section(profileName)
 
 		switch {
-		case returnProfile == false &&
-			expiration == false &&
+		case !returnProfile &&
+			!expiration &&
 			len(strings) > 0:
 			assumeCommand(
 				arguments{
 					account,
 					profileName,
 				})
-		case expiration != false:
+		case expiration:
 			if sect.HasKey("expiration") {
 				fmt.Println(remainingTime(sect))
 			}
-		case returnProfile != false:
+		case returnProfile:
 			if sect.HasKey("named_profile") {
 				fmt.Println(returnProfileName(sect))
 			}
-		case returnNameExpiration != false:
-			if sect.HasKey("named_profile") && sect.HasKey("expiration"){
+		case returnNameExpiration:
+			if sect.HasKey("named_profile") && sect.HasKey("expiration") {
 				fmt.Print(returnProfileName(sect) + " " + remainingTime(sect))
 			}
 		default:

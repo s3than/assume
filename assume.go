@@ -95,8 +95,7 @@ func getCredentials(args arguments) (credentials, error) {
 	if err != nil {
 		return c, err
 	}
-	cfg.Append(credFile)
-
+	_ = cfg.Append(credFile)
 	sect, err := getSection(cfg, a)
 	if err != nil {
 		return c, err
@@ -108,6 +107,9 @@ func getCredentials(args arguments) (credentials, error) {
 			return c, err
 		}
 		err = sect.MapTo(&c)
+		if err != nil {
+			return c, err
+		}
 	}
 	return c, err
 }
@@ -137,7 +139,13 @@ func writeFile(a *sts.Credentials, c credentials, p string) error {
 		return err
 	}
 	credSect, err := cfg.NewSection(p)
+	if err != nil {
+		return err
+	}
 	err = credSect.ReflectFrom(wc)
+	if err != nil {
+		return err
+	}
 	err = cfg.SaveTo(credFilePath)
 	if err != nil {
 		return err
@@ -226,6 +234,10 @@ func generateCredentials(c credentials) (*sts.Credentials, error) {
 	var output interface{}
 
 	s, err := session(c)
+	if err != nil {
+		return nil, err
+	}
+	
 	stsSession := sts.New(s)
 
 	callerIdentity, err := stsSession.GetCallerIdentity(&sts.GetCallerIdentityInput{})
