@@ -1,7 +1,7 @@
 module github.com/s3than/assume
 
 require (
-	github.com/aws/aws-sdk-go v1.15.43
+	github.com/aws/aws-sdk-go v1.25.30
 	github.com/boombuler/barcode v1.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.7.0
