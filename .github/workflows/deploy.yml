@@ -1,4 +1,8 @@
-on: [push]
+# Trigger the workflow on pull request activity
+on:
+  release:
+    # Only use the types keyword to narrow down the activity types that will trigger your workflow.
+    types: [published`]
 name: Deploy
 jobs:
   build:
