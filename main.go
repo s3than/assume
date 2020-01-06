@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"math"
 	"os/user"
 	"time"
 
@@ -99,9 +98,9 @@ func main() {
 }
 
 func returnProfileName(sect *ini.Section) string {
+	expiration, _ := sect.Key("expiration").Time()
 	namedProfile := sect.Key("named_profile").String()
-
-	if !expired(sect) {
+	if !(time.Duration(0) < time.Until(expiration)) {
 		return color.RedString(namedProfile)
 	}
 	return color.GreenString(namedProfile)
@@ -111,20 +110,10 @@ func remainingTime(sect *ini.Section) string {
 	expiration, _ := sect.Key("expiration").Time()
 	h, m := fmtDuration(time.Until(expiration))
 
-	if !expired(sect) {
+	if !(time.Duration(0) < time.Until(expiration)) {
 		return color.RedString("%02dh:%02dm", h, m)
 	}
 	return color.GreenString("%02dh:%02dm", h, m)
-}
-
-func expired(sect *ini.Section) bool {
-	expiration, _ := sect.Key("expiration").Time()
-	h, m := fmtDuration(time.Until(expiration))
-
-	if math.Signbit(float64(h)) && math.Signbit(float64(m)) {
-		return false
-	}
-	return true
 }
 
 func fmtDuration(d time.Duration) (time.Duration, time.Duration) {
