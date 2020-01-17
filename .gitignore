@@ -7,3 +7,4 @@ profile.out
 dist/
 !go.mod
 .idea
+.vscode
