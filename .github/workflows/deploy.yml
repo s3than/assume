@@ -1,32 +1,19 @@
-on: [release]
+# Trigger the workflow on pull request activity
+on:
+  release:
+    # Only use the types keyword to narrow down the activity types that will trigger your workflow.
+    types: [published`]
 name: Deploy
 jobs:
-  filters:
-    name: Filters
+  build:
+    name: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Docker Login
-        uses: actions/docker/login@master
-        env:
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       - name: goreleaser
         uses: docker://goreleaser/goreleaser
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: release
-      - name: Docker Build
-        uses: actions/docker/cli@aea64bb1b97c42fa69b90523667fef56b90d7cff
-        with:
-          args: build -t assume .
-      - name: Docker Tag
-        uses: actions/docker/tag@aea64bb1b97c42fa69b90523667fef56b90d7cff
-        with:
-          args: assume s3than/assume
-      - name: Docker Push
-        uses: actions/docker/cli@aea64bb1b97c42fa69b90523667fef56b90d7cff
-        with:
-          args: push s3than/assume
 
