@@ -1,7 +1,7 @@
 module github.com/s3than/assume
 
 require (
-	github.com/aws/aws-sdk-go v1.28.3
+	github.com/aws/aws-sdk-go v1.29.8
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.9.0
 	github.com/genuinetools/pkg v0.0.0-20180910213200-1c141f661797
