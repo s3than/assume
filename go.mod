@@ -11,8 +11,6 @@ require (
 	github.com/pquerna/otp v1.2.0
 	github.com/smartystreets/assertions v0.0.0-20180820201707-7c9eb446e3cf // indirect
 	github.com/smartystreets/goconvey v0.0.0-20180222194500-ef6db91d284a // indirect
-	golang.org/x/net v0.0.0-20180926154720-4dfa2610cdf3 // indirect
-	golang.org/x/text v0.3.0 // indirect
 	gopkg.in/ini.v1 v1.38.2 // indirect
 )
 
