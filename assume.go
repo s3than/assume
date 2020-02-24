@@ -95,7 +95,10 @@ func getCredentials(args arguments) (credentials, error) {
 	if err != nil {
 		return c, err
 	}
-	_ = cfg.Append(credFile)
+	err = cfg.Append(credFile)
+	if err != nil {
+		return c, err
+	}
 	sect, err := getSection(cfg, a)
 	if err != nil {
 		return c, err
@@ -237,7 +240,6 @@ func generateCredentials(c credentials) (*sts.Credentials, error) {
 	if err != nil {
 		return nil, err
 	}
-	
 	stsSession := sts.New(s)
 
 	callerIdentity, err := stsSession.GetCallerIdentity(&sts.GetCallerIdentityInput{})
